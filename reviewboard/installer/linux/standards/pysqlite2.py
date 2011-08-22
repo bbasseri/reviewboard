@@ -9,7 +9,7 @@ import time
 
 
 def guide():
-    return "To install MySQL bindings type 'easy_install pysqlite' "
+    return "To install SQLite bindings type 'easy_install pysqlite' "
 
 
 def install():
