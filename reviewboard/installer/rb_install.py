@@ -22,18 +22,20 @@ Version = platform.uname()[2]
 Arch = platform.uname()[4]
 
 if OperatingSystem == "Linux":
+    OperatingSystem = "linux"
     SystemInfo = platform.linux_distribution()
     Platform = SystemInfo[0]
     if Platform in apt_platforms:
-        kind = "Standards"
+        kind = "standards"
     else:
-        kind = "Yums"
+        kind = "yums"
 elif OperatingSystem == "Windows":
+    OperatingSystem = "windows"
     try:
         imp.find_module("win32api")
     except ImportError:
         DependencyInstaller("win32ins", "install")
-    kind = "X86"
+    kind = "x86"
 
 
 def DependencyInstaller(module, action):

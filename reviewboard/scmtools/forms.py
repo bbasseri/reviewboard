@@ -1,6 +1,7 @@
 import imp
 import re
 import sys
+from reviewboard.installer.rb_install import DependencyInstaller, InstallerModuleError
 
 from django import forms
 from django.contrib.admin.widgets import FilteredSelectMultiple
@@ -577,11 +578,13 @@ class RepositoryForm(forms.ModelForm):
         scmtool_class = tool.get_scmtool_class()
 
         errors = []
+        missing_deps = []
 
         for dep in scmtool_class.dependencies.get('modules', []):
             try:
                 imp.find_module(dep)
             except ImportError:
+                missing_deps.append(dep)
                 errors.append('The Python module "%s" is not installed.'
                               'You may need to restart the server '
                               'after installing it.' % dep)
@@ -595,6 +598,14 @@ class RepositoryForm(forms.ModelForm):
 
                 errors.append('The executable "%s" is not in the path.' %
                               exe_name)
+                missing_deps.append(dep)
+        
+        for dep in missing_deps:
+            try:
+                errors.append(DependencyInstaller(dep,"guide"))
+            except InstallerModuleError:
+                errors.append("The guide is not available for %s" % dep)
+
 
         if errors:
             raise forms.ValidationError(errors)
