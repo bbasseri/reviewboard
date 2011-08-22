@@ -8,6 +8,8 @@ import sys
 import urllib
 
 
+# This script is used to download and install win32api. This library
+# is used to set system paths, within the windows platforms.
 def guide():
     print "Win32Api is required to be installed on your computer."
 

@@ -6,6 +6,8 @@ import win32api
 import win32con
 
 
+# This script is used to add some of the install files to the system path
+# of user's machine.
 def setPath(path):
     print "setting path"
     regkey = win32api.RegOpenKeyEx(win32con.HKEY_LOCAL_MACHINE, \

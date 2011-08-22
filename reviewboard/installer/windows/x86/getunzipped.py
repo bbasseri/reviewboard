@@ -4,6 +4,8 @@ import urllib
 import zipfile
 
 
+# This script is used to download and unzipp the file from 
+# url to the dl_dir.
 def get_unzipped(url, dl_dir,):
     if not dl_dir.endswith(':') and not os.path.exists(dl_dir):
         os.mkdir(dl_dir)

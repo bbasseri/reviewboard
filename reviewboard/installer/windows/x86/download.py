@@ -3,6 +3,8 @@ import sys
 import urllib
 
 
+# This is the download script to download a file from a the url
+# to dl_dir, with a certain file_name.
 def download(url, dl_dir, file_name):
     print "Starting download"
     if not dl_dir.endswith(':') and not os.path.exists(dl_dir):
