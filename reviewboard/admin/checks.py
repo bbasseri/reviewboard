@@ -32,6 +32,7 @@ import getpass
 import imp
 import os
 import sys
+from reviewboard.installer.rb_install import DependencyInstaller, InstallerModuleError
 
 from django.conf import settings
 from django.db import DatabaseError
@@ -184,9 +185,13 @@ def get_can_enable_search():
         imp.find_module("lucene")
         return (True, None)
     except ImportError:
+        try:
+            guide = DependencyInstaller("pylucene","guide")
+        except InstallerModuleError:
+            guide = ""        
         return (False, _(
             'PyLucene (with JCC) is required to enable search. See the '
-            '<a href="%(url)s">documentation</a> for instructions.'
+            '<a href="%(url)s">documentation</a> for instructions. ' + guide
         ) % {'url': 'http://www.reviewboard.org/docs/manual/dev/admin/'
                     'sites/enabling-search/'})
 
@@ -246,8 +251,12 @@ def get_can_use_amazon_s3():
         from storages.backends.s3 import S3Storage
         return (True, None)
     except ImportError:
-        return (False, _(
-            'Amazon S3 depends on django-storages, which is not installed'
+	try:
+		guide = DependencyInstaller("amazons3storage","guide")
+	except InstallerModuleError:
+		guide = ""        
+	return (False, _(
+            'Amazon S3 depends on django-storages, which is not installed %s'% guide
         ))
 
 
