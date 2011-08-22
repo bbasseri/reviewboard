@@ -12,6 +12,7 @@ import textwrap
 import warnings
 from optparse import OptionGroup, OptionParser
 from random import choice
+from reviewboard.installer.rb_install import DependencyInstaller, InstallerModuleError
 
 from reviewboard import get_version_string
 
@@ -80,7 +81,7 @@ class Dependencies(object):
     @classmethod
     def get_support_memcached(cls):
         return cls.has_modules(cls.memcached_modules)
-
+        
     @classmethod
     def get_support_mysql(cls):
         return cls.has_modules(cls.mysql_modules)
@@ -868,6 +869,7 @@ class GtkUI(UIToolkit):
         self.close_button = gtk.Button(stock=gtk.STOCK_CLOSE)
         self.bbox.pack_start(self.close_button, False, False, 0)
         self.close_button.connect('clicked', lambda w: self.quit())
+            
 
     def run(self):
         if self.pages:
@@ -1410,14 +1412,95 @@ class InstallCommand(Command):
 
     def ask_database_type(self):
         page = ui.page("What database type will you be using?")
-
+        mysql_status = "(installed)"
+        postgresql_status = "(installed)"
+        sqlite_status = "(installed)"
+        try:
+            imp.find_module("mysqldb")
+            # ui.text(page,mysql_status)
+        except ImportError:
+            mysql_status = "(not installed)" 
+            # ui.text(page,"(not installed)")
+        try:
+            imp.find_module("psycopg2")
+            # ui.text(page,postgresql_status)
+        except ImportError:
+            postgresql_status = "(not installed)" 
+            # ui.text(page,"(not installed)")
+        try:
+            imp.find_module("pysqlite2")
+            # ui.text(page,sqlite_status)
+        except ImportError:
+            sqlite_status = "(not installed)" 
+            # ui.text(page,"(not installed)")
+            
         ui.prompt_choice(page, "Database Type",
-                         [("mysql", Dependencies.get_support_mysql()),
-                          ("postgresql", Dependencies.get_support_postgresql()),
-                          ("sqlite3",
+                         [("mysql %s" %mysql_status, Dependencies.get_support_mysql()),
+                          ("postgresql %s" %postgresql_status, Dependencies.get_support_postgresql()),
+                          ("sqlite3 %s" %sqlite_status,
                            "(not supported for production use)",
                            Dependencies.get_support_sqlite())],
                          save_obj=site, save_var="db_type")
+
+        if(mysql_status == "(not installed)"):
+            #ui.text(page, DependencyInstaller("MySQLdb","guide"))
+            
+            # bbox = gtk.HButtonBox()
+            # bbox.show()
+
+            # text = DependencyInstaller("MySQLdb","guide")
+            # label = gtk.Label(text)
+            # # label = gtk.Label(textwrap.fill(text, 50))
+            # # label.set_text(text)
+            # label.show()
+            # bbox.pack_start(label, False, False, 0)
+            
+            # ui.install_button = gtk.Button("_Install")
+            # ui.install_button.show()
+            # # ui.install_button.set_size_request(5, 5)
+            # bbox.pack_start(ui.install_button, True, False, 0)
+            # bbox.set_border_width(1)
+            # bbox.set_layout(gtk.BUTTONBOX_END)
+            # #bbox.set_spacing(1)
+
+            # page['widget'].pack_start(bbox, False, False, 0)
+            ui.text(page, DependencyInstaller("MySQLdb","guide"))
+            ui.install_button = gtk.Button("_Install")
+            ui.install_button.show()
+            bbox = gtk.HButtonBox()
+            bbox.show()
+            bbox.pack_start(ui.install_button, False, False, 0)
+            ui.install_button.connect('clicked', lambda w: DependencyInstaller("MySQLdb","install"))
+
+            bbox.set_layout(gtk.BUTTONBOX_END)
+            page['widget'].pack_start(bbox, False, False, 0)
+
+        if(postgresql_status == "(not installed)"):
+            bbox = gtk.HButtonBox()
+            bbox.show()
+            ui.text(page, DependencyInstaller("psycopg2","guide"))
+            ui.install_button = gtk.Button("_Install")
+            ui.install_button.show()
+            bbox.pack_start(ui.install_button, False, False, 0)
+            ui.install_button.connect('clicked', lambda w: DependencyInstaller("psycopg2","install"))
+            bbox.set_layout(gtk.BUTTONBOX_END)
+            
+            page['widget'].pack_start(bbox, False, False, 0)
+
+        if(sqlite_status == "(not installed)"):
+            ui.text(page, DependencyInstaller("pysqlite2","guide"))
+            ui.install_button = gtk.Button("_Install")
+            ui.install_button.show()
+            # ui.install_button.set_size_request(5, 5)
+            bbox = gtk.HButtonBox()
+            bbox.show()
+            bbox.pack_start(ui.install_button, False, False, 0)
+            #bbox.set_border_width(1)
+            bbox.set_layout(gtk.BUTTONBOX_END)
+            #bbox.set_spacing(1)
+
+            
+            page['widget'].pack_start(bbox, False, False, 0)
 
     def ask_database_name(self):
         def determine_sqlite_path():
@@ -1487,11 +1570,32 @@ class InstallCommand(Command):
         ui.text(page, "memcached is strongly recommended. Use it unless "
                       "you have a good reason not to.")
 
+        memcache_status = "(installed)"
+        try:
+            imp.find_module("memcache")
+            # ui.text(page, "(installed)")
+        except InstallerModuleError:
+            # ui.text(page, infotos("memcached"))
+            memcache_status = "(not installed)"
+
         ui.prompt_choice(page, "Cache Type",
-                         [("memcached", "(recommended)",
+                         [("memcached %s" %memcache_status, "(recommended)",
                            Dependencies.get_support_memcached()),
                           "file"],
                          save_obj=site, save_var="cache_type")
+
+        if(memcache_status == "(installed)"):
+            ui.text(page, DependencyInstaller("memcached","guide"))
+            ui.install_button = gtk.Button("_Install")
+            ui.install_button.show()
+            bbox = gtk.HButtonBox()
+            bbox.show()
+            bbox.pack_start(ui.install_button, False, False, 0)
+            ui.install_button.connect('clicked', lambda w: DependencyInstaller("memcached","install"))
+
+            bbox.set_layout(gtk.BUTTONBOX_END)
+            page['widget'].pack_start(bbox, False, False, 0)
+            
 
     def ask_cache_info(self):
         # Appears only if using memcached.
