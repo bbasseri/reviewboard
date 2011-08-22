@@ -11,16 +11,17 @@ import sys
 class InstallerModuleError(Exception):
     pass
 
+# List the different platforms to install dependencies on.
 apt_platforms = ["Ubuntu", "Debian"]
 yum_platforms = ["Fedora", "RedHat Enterprise", "Fedora", "CentOS"]
-
+# Different user choices.
 positivelist = ["Yes", "yes", "Y", "y"]
 negativelist = ["No", "no", "N", "n"]
-
+# Retreiving system information.
 OperatingSystem = platform.uname()[0]
 Version = platform.uname()[2]
 Arch = platform.uname()[4]
-
+# Finding the path of the dependency installer file.
 if OperatingSystem == "Linux":
     OperatingSystem = "linux"
     SystemInfo = platform.linux_distribution()
@@ -38,6 +39,8 @@ elif OperatingSystem == "Windows":
     kind = "x86"
 
 
+# Based on the action selected (guide, install) executes the correct
+# function from the dependency file.
 def DependencyInstaller(module, action):
     ApplicationName = module
     filename = ("%s.%s.%s" % (OperatingSystem, kind, module))
@@ -51,6 +54,9 @@ def DependencyInstaller(module, action):
     return responsible_function()
 
 
+# main function that makes sure if the script has been called from the
+# terminal or cmd, the user can specify which program they want to
+# install or get the guide for.
 def main():
     if len(sys.argv) == 1:
         empty = raw_input("You need to choose an application to install.\n"\
