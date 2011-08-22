@@ -1,0 +1,69 @@
+=========================================
+Review Board Cross platform Documentation
+=========================================
+
+
+rb_install:
+===========
+This file is placed in reviewboard/reviewboard/installer . The purpose of this
+file is to figure out the platform of the user's machine, and based on those
+information and the dependency and the action sent to this module it will
+install or give the guide on how to install that dependency.
+
+The user can use this file through terminal/cmd:
+*It is very important to have admin privilages if the user wants to install
+the dependency (Call it with sudo on Linux platforms)*
+
+"python rb_install 'dependency_name(ex. mysqldb)'"
+
+After this guide the user is prompted with the question to install or get the
+guide.
+
+This file is used in:
+reviewboard/reviewboard/scmtools/forms.py (For repository dependencies)
+reviewboard/reviewboard/cmdline/rbsite.py (ReviewBoard installer Wizard)
+reviewboard/reviewboard/admin/checks.py (Dependency check for search)
+
+
+
+Linux_Installer files:
+======================
+These files are included in reviewboard/reviewboard/installer/linux .
+The linux installation is divided into two sections of APT and YUM installers.
+Each of the files include seperate guide and installation methods for each
+application.
+
+The rb_install file will automatically call the required dependencies script
+with the specified action ("install/guide").
+
+
+Windows_Installer files:
+========================
+The Windows installer uses different script for each install file.
+Some important modules that are used are:
+-urllib library(To download)
+-get_unzipped (To download and unzip the file to certain location)(included)
+-win32api (Required to set path of applications)(handled by rb_install)
+-setPath (Used to add an application to system paths)(included)
+
+Windows installation files are included in reviewboard/reviewboard/installer/
+windows/x86 .
+
+The Windows installation is limited to one folder, to avoide repetition of
+installer files. For both 32bit and 64bit Windows platforms 32bit versions
+of application are used because they are supported in both platforms. In
+special cases that special instructions are required for the 64bit platforms
+the instructions happen within the script(mostly setting the correct path).
+
+The rb_install file will automatically call the required dependencies script
+with the specified action ("install/guide").
+
+
+Upgrade:
+========
+The upgrade script is general between Windows and Linux platforms. The script
+is located at reviewboard/upgrade.py . This script acquires the lates version
+of ReviewBoard from the ReviewBoard API, and upgrades the application to the
+latest version.
+
+This script has to be executed with admin privilages.

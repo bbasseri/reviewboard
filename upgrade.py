@@ -7,7 +7,14 @@ import urllib
 import xml.dom.minidom
 from xml.dom import minidom
 
+# This Script is used to Upgrade ReviewBoard. The user requires
+# Admin privilages in order to upgrade.
 
+
+# Returns and array which includes the final stable version
+# and the final development version of ReviewBoard.
+# Using JSON to interact with the API and to retrieve the
+# Latest version of the code.
 def GetLatestVersion():
     path = "/api/products/reviewboard/?expand=development_version,"\
     + "stable_version&api_format=json"
@@ -38,10 +45,12 @@ def GetLatestVersion():
     return result_array
 
 
+# Returns an array of the version the user is using.
 def GetCurrentVersion():
     return VERSION
 
 
+# Returns True of the user is using the final released version.
 def Check():
     if get_package_version() != str(GetLatestVersion()[0][2]) and \
     get_package_version() != str(GetLatestVersion()[1][2]):
@@ -49,11 +58,14 @@ def Check():
     return True
 
 
+# Upgrades the ReviewBoard version the user is using.
+# Major is "major_version.minor_version" and version is the complete version.
 def Upgrade(major, version):
     if version:
         call(["easy_install", "-f",\
         "http://downloads.reviewboard.org/releases/ReviewBoard/%s/" % major,\
         "-U", "Reviewboard==%s" % version])
+
 
 if __name__ == "__main__":
     stableVersion = GetLatestVersion()[0]

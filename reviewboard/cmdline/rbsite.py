@@ -1464,7 +1464,7 @@ class InstallCommand(Command):
             # #bbox.set_spacing(1)
 
             # page['widget'].pack_start(bbox, False, False, 0)
-            ui.text(page, DependencyInstaller("MySQLdb","guide"))
+            ui.text(page, DependencyInstaller("mysqldb","guide"))
             ui.install_button = gtk.Button("_Install")
             ui.install_button.show()
             bbox = gtk.HButtonBox()
